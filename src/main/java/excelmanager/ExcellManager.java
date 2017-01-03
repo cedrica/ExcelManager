@@ -6,16 +6,12 @@
  */
 package excelmanager;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,26 +26,23 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.dom4j.util.UserDataElement;
 
 import excelmanager.annotations.XLS;
+import excelmanager.annotations.XlsAdditionalInformation;
 import excelmanager.annotations.XlsColumn;
-import excelmanager.enums.Declaratoin;
+import excelmanager.annotations.XlsStyler;
 import excelmanager.enums.Location;
 import excelmanager.enums.Orientation;
-import excelmanager.exception.Assertion;
-import excelmanager.helper.AdditionalInformation;
-import excelmanager.style.HeaderStyleInfo;
+import excelmanager.style.StyleData;
 import excelmanager.style.WoorkbookStyler;
 
 
 @SuppressWarnings("all")
 public class ExcellManager {
 	private HashMap<String, HSSFCellStyle> hmFieldStyle = null;
-//	private int rownum = 0;
-//	private int cellnum = 0;
-//	private Row row;
-	
+	private static int FRIST_ROW_INDEX_FOR_DATA = 0;
 	public ExcellManager() {
 	}
 
@@ -64,46 +57,55 @@ public class ExcellManager {
 		String sheetname = "";
 		int rownum = 0;
 		int cellnum = 0;
-//		Row row;
+		HashMap<Location, String> footerInfo = new HashMap<>();
+		Row row;
 		XLS xls = (XLS) entityClazz.getAnnotation(XLS.class);
+		XlsAdditionalInformation additionalInformation = null;
 		if (xls != null) {
 			sheetname = (xls.sheetsname().trim().length() <= 0) ? entityClazz.getSimpleName() : xls.sheetsname();
+			additionalInformation = xls.xlsAdditionalInformation();
 		} else {
 			return null;
 		}
 		HSSFSheet sheet = workbook.createSheet(sheetname);
+		if(additionalInformation != null){
+			String text = additionalInformation.text();
+			Location location = additionalInformation.location();
+			int colspan = additionalInformation.colspan();
+			if(location == Location.BOTTOM){
+				footerInfo.put(Location.BOTTOM,text+" colspan= "+colspan);
+			}else {
+				row = sheet.createRow(rownum++);
+				FRIST_ROW_INDEX_FOR_DATA = rownum;
+				Cell cell = row.createCell((short)0);
+				cell.setCellValue(text);
+				sheet.addMergedRegion(new CellRangeAddress(
+		                        0, // mention first row here
+		                        0, //mention last row here, it is 1 as we are doing a column wise merging
+		                        0, //mention first column of merging
+		                        colspan  //mention last column to include in merge
+		                        ));	
+			}
+
+		}
 		final List<Field> fields = Arrays.asList(entityClazz.getDeclaredFields());
 		final List<Field> usedFields = new ArrayList<Field>();
 		final List<String> nameOfUsedFields = new ArrayList<String>();
 		hmFieldStyle = new HashMap<String, HSSFCellStyle>();
 		WoorkbookStyler woorkbookStyler = new WoorkbookStyler();
-		HeaderStyleInfo headerStyleInfo = new HeaderStyleInfo();
+		
 		fields.forEach(f -> {
 			XlsColumn xlsAnnotation = f.getAnnotation(XlsColumn.class);
 			if (xlsAnnotation != null) {
+				StyleData styleData = new StyleData();
 				String customname = xlsAnnotation.customname();
-				short bgColor = xlsAnnotation.bgColor();
-				short fgColor = xlsAnnotation.fgColor();
-				Orientation orientation = xlsAnnotation.orientation();
-				boolean italic = xlsAnnotation.isItalic();
-				boolean bold = xlsAnnotation.isBold();
-				String fontName = xlsAnnotation.fontName();
-				int fontSize = xlsAnnotation.fontSize();
-
-				headerStyleInfo.setOrientation(orientation);
-				headerStyleInfo.setBgColor(bgColor);
-				headerStyleInfo.setFgColor(fgColor);
-				headerStyleInfo.setBold(HSSFFont.BOLDWEIGHT_BOLD);
-				headerStyleInfo.setFontSize((short) fontSize);
-				headerStyleInfo.setItalic(italic);
-				headerStyleInfo.setFontName(fontName);
-
-				woorkbookStyler.setHeaderStyleInfo(headerStyleInfo);
+				XlsStyler xlsStyler = xlsAnnotation.styler();
+				styleData = extractStyleInfo(xlsStyler);
+				woorkbookStyler.setStyle(styleData);
 				woorkbookStyler.style(workbook);
 				nameOfUsedFields.add((customname.length() <= 0) ? f.getName() : customname);
 				usedFields.add(f);
-				hmFieldStyle.put((customname.length() <= 0) ? f.getName() : customname, woorkbookStyler.headerStyle);
-				System.out.println("custonname for field " + f.getName() + " => " + xlsAnnotation.customname());
+				hmFieldStyle.put((customname.length() <= 0) ? f.getName() : customname, woorkbookStyler.style);
 			}
 		});
 		Map<Integer, Object[]> data = new HashMap<Integer, Object[]>();
@@ -112,13 +114,13 @@ public class ExcellManager {
 		for (T t : entities) {
 			data.put(key++, builtRowFrom(t, usedFields));
 		}
-
+		
 		Set<Integer> keyset = data.keySet();
 		for (int k : keyset) {
-			Row row = sheet.createRow(rownum);
+			row = sheet.createRow(rownum);
 			Object[] objArr = data.get(k);
 			// Insert header line in the data
-			if (rownum == 0) {
+			if (rownum == FRIST_ROW_INDEX_FOR_DATA) {
 				for (Object obj : objArr) {
 					Cell cell = row.createCell(cellnum++);
 					cell.setCellValue(obj.toString());
@@ -130,27 +132,49 @@ public class ExcellManager {
 			cellnum = 0;
 			for (Object obj : objArr) {
 				insertObjectAtRow(sheet, row, obj, cellnum);
+				cellnum++;
 			}
 			rownum++;
 		}
+		if(footerInfo != null &&  footerInfo.size() > 0){
+			String textColspan = footerInfo.get(Location.BOTTOM);
+			if (textColspan.trim().length() > 0){
+				String[] splittedStr = textColspan.split("colspan=");
+				String text = splittedStr[0];
+				int colspan = Integer.valueOf(splittedStr[1].trim());
+				row = sheet.createRow(rownum++);
+				Cell cell = row.createCell((short)0);
+				cell.setCellValue(text);
+				sheet.addMergedRegion(new CellRangeAddress(
+								entities.size()+1, // mention first row here
+								entities.size()+1, //mention last row here, it is 1 as we are doing a column wise merging
+		                        0, //mention first column of merging
+		                        colspan  //mention last column to include in merge
+		                        ));	
+			}
+
+		}
 		return workbook;
-//		if (fileToBeSaved != null) {
-//			try {
-//				File f = new File(fileToBeSaved.getPath());
-//				if(f.isFile() && f.exists()){
-//					f.delete();
-//				}
-//				FileOutputStream out = new FileOutputStream(f,false);
-//				workbook.write(out);
-//				out.close();
-//				System.out.println("Excel written successfully..");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			System.out.println("File saved: " + fileToBeSaved.getPath());
-//		} else {
-//			System.err.println("ERROR: File path is null.");
-//		}
+	}
+
+	public StyleData extractStyleInfo( XlsStyler xlsStyler) {
+		StyleData styleData = new StyleData();
+		short bgColor = xlsStyler.bgColor();
+		short fgColor = xlsStyler.fgColor();
+		Orientation orientation = xlsStyler.orientation();
+		boolean italic = xlsStyler.isItalic();
+		boolean bold = xlsStyler.isBold();
+		String fontName = xlsStyler.fontName();
+		int fontSize = xlsStyler.fontSize();
+
+		styleData.setOrientation(orientation);
+		styleData.setBgColor(bgColor);
+		styleData.setFgColor(fgColor);
+		styleData.setBold(HSSFFont.BOLDWEIGHT_BOLD);
+		styleData.setFontSize((short) fontSize);
+		styleData.setItalic(italic);
+		styleData.setFontName(fontName);
+		return styleData;
 	}
 
 	public void insertObjectAtRow(HSSFSheet sheet, Row row, Object obj, int cellnum) {
@@ -171,7 +195,6 @@ public class ExcellManager {
 			cell.setCellValue((Float) obj);
 		}
 		sheet.autoSizeColumn((short) cellnum);
-		cellnum++;
 	}
 
 
@@ -193,194 +216,6 @@ public class ExcellManager {
 		}
 
 		return ol;
-	}
-
-	/**
-	 * generate a single workbook for all POJOs inside the given list and add
-	 * the additional information at the TOP or at the BOTTOM of the data
-	 * content
-	 *
-	 * @param entities
-	 * @param entityClazz
-	 * @param additionalInformation
-	 * @param location
-	 */
-	public <T> Workbook generateSingleSheetReportWithAdditionalInfo(List<T> entities, Class entityClazz,
-			List<AdditionalInformation> additionalInformation, Location location) {
-		HSSFWorkbook workbook = new HSSFWorkbook();
-//		String sheetname = "";
-//		XLS xls = (XLS) entityClazz.getAnnotation(XLS.class);
-//		if (xls != null) {
-//			sheetname = (xls.sheetsname().trim().length() <= 0) ? entityClazz.getSimpleName() : xls.sheetsname();
-//		} else {
-//			return workbook;
-//		}
-//		System.out.println("Sheetname = " + sheetname);
-//		HSSFSheet sheet = workbook.createSheet(sheetname);
-//		final List<Field> fields = Arrays.asList(entityClazz.getDeclaredFields());
-//		final List<Field> usedFields = new ArrayList<Field>();
-//		final List<String> nameOfUsedFields = new ArrayList<String>();
-//		hmFieldStyle = new HashMap<String, HSSFCellStyle>();
-//		WoorkbookStyler woorkbookStyler = new WoorkbookStyler();
-//		HeaderStyleInfo headerStyleInfo = new HeaderStyleInfo();
-//		fields.forEach(f -> {
-//			XlsColumn xlsAnnotation = f.getAnnotation(XlsColumn.class);
-//			if (xlsAnnotation != null) {
-//				String customname = xlsAnnotation.customname();
-//				short bgColor = xlsAnnotation.bgColor();
-//				short fgColor = xlsAnnotation.fgColor();
-//				Orientation orientation = xlsAnnotation.orientation();
-//				boolean italic = xlsAnnotation.isItalic();
-//				boolean bold = xlsAnnotation.isBold();
-//				String fontName = xlsAnnotation.fontName();
-//				int fontSize = xlsAnnotation.fontSize();
-//
-//				headerStyleInfo.setOrientation(orientation);
-//				headerStyleInfo.setBgColor(bgColor);
-//				headerStyleInfo.setFgColor(fgColor);
-//				headerStyleInfo.setBold(HSSFFont.BOLDWEIGHT_BOLD);
-//				headerStyleInfo.setFontSize((short) fontSize);
-//				headerStyleInfo.setItalic(italic);
-//				headerStyleInfo.setFontName(fontName);
-//
-//				woorkbookStyler.setHeaderStyleInfo(headerStyleInfo);
-//				woorkbookStyler.style(workbook);
-//				nameOfUsedFields.add((customname.length() <= 0) ? f.getName() : customname);
-//				usedFields.add(f);
-//				hmFieldStyle.put((customname.length() <= 0) ? f.getName() : customname, woorkbookStyler.headerStyle);
-//				System.out.println("custonname for field " + f.getName() + " => " + xlsAnnotation.customname());
-//			}
-//		});
-//		Map<Integer, Object[]> data = new HashMap<Integer, Object[]>();
-//		rownum = 0;
-//		cellnum = 0;
-//		int key = 1;
-//
-//		boolean isHeaderAlreadyDone = false;
-//		if (location == Location.TOP) {
-//			int rowCount = additionalInformation.size();
-//			additionalInformation.forEach(ids -> {
-//				row = sheet.createRow(rownum++);
-//				Cell input = row.createCell(cellnum++);
-//				input.setCellValue(ids.getInput());
-//				Cell value = row.createCell(cellnum++);
-//				value.setCellValue(ids.getValue());
-//				cellnum = 0;
-//			});
-//			row = sheet.createRow(rownum++);
-//			lineSeparator(row, workbook, 2);
-//			isHeaderAlreadyDone = true;
-//		}
-//		// Insert header line in the data
-//		data.put(0, nameOfUsedFields.toArray());
-//		for (T t : entities) {
-//			data.put(key++, builtRowFrom(t, usedFields));
-//		}
-//		HSSFCellStyle rowStyle = workbook.createCellStyle();
-//		rowStyle.setWrapText(true);
-//		Set<Integer> keyset = data.keySet();
-//		for (Integer k : keyset) {
-//			row = sheet.createRow(rownum);
-//			Object[] objArr = data.get(k);
-//			cellnum = 0;
-//			// Create header line in the excel doc
-//			if (rownum == 0 || isHeaderAlreadyDone) {
-//				for (Object obj : objArr) {
-//					Cell cell = row.createCell(cellnum++);
-//					cell.setCellValue(obj.toString());
-//					cell.setCellStyle(hmFieldStyle.get(obj.toString()));
-//				}
-//				isHeaderAlreadyDone = false;
-//				rownum++;
-//				continue;
-//			}
-//			for (Object obj : objArr) {
-//				Cell cell = row.createCell(cellnum);
-//				if (obj instanceof Date) {
-//					cell.setCellValue((Date) obj);
-//				} else if (obj instanceof Boolean) {
-//					cell.setCellValue((Boolean) obj);
-//				} else if (obj instanceof String) {
-//					cell.setCellValue((String) obj);
-//				} else if (obj instanceof Double) {
-//					cell.setCellValue((Double) obj);
-//				} else if (obj instanceof Integer) {
-//					cell.setCellValue((Integer) obj);
-//				} else if (obj instanceof Long) {
-//					cell.setCellValue((Long) obj);
-//				} else if (obj instanceof Float) {
-//					cell.setCellValue((Float) obj);
-//				}
-//				sheet.autoSizeColumn((short) cellnum);
-//				cellnum++;
-//			}
-//			row.setRowStyle(rowStyle);
-//			rownum++;
-//		}
-//
-//		if (location == Location.BOTTOM) {
-//			row = sheet.createRow(rownum++);
-//			lineSeparator(row, workbook, 2);
-//			int rowCount = additionalInformation.size();
-//			cellnum = 0;
-//			additionalInformation.forEach(ids -> {
-//				row = sheet.createRow(rownum++);
-//				Cell input = row.createCell(cellnum++);
-//				input.setCellValue(ids.getInput());
-//				Cell value = row.createCell(cellnum++);
-//				value.setCellValue(ids.getValue());
-//				cellnum = 0;
-//			});
-//		}
-
-//		if (fileToBeSaved != null) {
-//			try {
-//				FileOutputStream out = new FileOutputStream(new File(fileToBeSaved.getPath()));
-//				workbook.write(out);
-//				out.close();
-//				System.out.println("Excel written successfully..");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			System.out.println("File saved: " + fileToBeSaved.getPath());
-//		} else {
-//			System.out.println("File save cancelled.");
-//		}
-		return workbook;
-	}
-
-	private void lineSeparator(Row row, HSSFWorkbook workbook, int cellCount) {
-		CellStyle cellStyle = workbook.createCellStyle();
-		cellStyle.setFillForegroundColor(HSSFColor.GREY_50_PERCENT.index);
-		cellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-		for (int i = 0; i < cellCount; i++) {
-			row.createCell(i).setCellStyle(cellStyle);
-			;
-		}
-	}
-
-	/**
-	 * Set a value in a sheet a the given cell position
-	 *
-	 * @param sheet
-	 * @param rowIndex
-	 * @param cellIndex
-	 * @param value
-	 */
-	public void setValueAt(HSSFSheet sheet, long rowIndex, long cellIndex, Object value) {
-
-		if (value instanceof Double) {
-			sheet.getRow((int) rowIndex).getCell((int) cellIndex).setCellValue(Double.valueOf(value.toString()));
-		} else if (value instanceof String) {
-			sheet.getRow((int) rowIndex).getCell((int) cellIndex).setCellValue(value.toString());
-		} else if (value instanceof Date) {
-			sheet.getRow((int) rowIndex).getCell((int) cellIndex).setCellValue(value.toString());
-		} else if (value instanceof Boolean) {
-			sheet.getRow((int) rowIndex).getCell((int) cellIndex).setCellValue(Boolean.valueOf(value.toString()));
-		} else if (value instanceof RichTextString) {
-			sheet.getRow((int) rowIndex).getCell((int) cellIndex).setCellValue(value.toString());
-		}
-
 	}
 
 	public void setCellFormular(HSSFCell cell, String formula) {

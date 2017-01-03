@@ -15,4 +15,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface XLS {
 	String sheetsname();
+	XlsAdditionalInformation xlsAdditionalInformation() default @XlsAdditionalInformation();
 }

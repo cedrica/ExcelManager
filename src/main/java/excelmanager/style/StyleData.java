@@ -3,7 +3,7 @@ package excelmanager.style;
 import excelmanager.enums.Format;
 import excelmanager.enums.Orientation;
 
-public class HeaderStyleInfo {
+public class StyleData {
 	private Short alignment;
 	private Short bgColor;
 	private Short fontColor;
@@ -16,7 +16,7 @@ public class HeaderStyleInfo {
 	private short bold;
 	private String fontName;
 
-	public HeaderStyleInfo() {
+	public StyleData() {
 	}
 
 	public Orientation getOrientation() {

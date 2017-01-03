@@ -13,87 +13,77 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 public class WoorkbookStyler {
 
-	public static HSSFCellStyle headerStyle;
-	public static HSSFCellStyle cellStyle;
-	private HeaderStyleInfo headerStyleInfo;
+	public static HSSFCellStyle style;
+//	public static HSSFCellStyle cellStyle;
+	private StyleData styleData;
 	private CellStyleInfo cellStyleInfo;
 
 	public WoorkbookStyler() {
-		headerStyleInfo = new HeaderStyleInfo();
-		cellStyleInfo = new CellStyleInfo();
+		styleData = new StyleData();
+//		cellStyleInfo = new CellStyleInfo();
 	}
 
-	public void createHeaderStyle(HSSFWorkbook wb) {
+	public void createStyle(HSSFWorkbook wb) {
 		HSSFFont font = wb.createFont();
 
-		if (headerStyleInfo.getFormat() != null)
-			headerStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(headerStyleInfo.getFormat().toString()));
+		if (styleData.getFormat() != null)
+			style.setDataFormat(HSSFDataFormat.getBuiltinFormat(styleData.getFormat().toString()));
 
-		if (headerStyleInfo.getAlignment() != null) {
-			headerStyle.setAlignment(headerStyleInfo.getAlignment().shortValue());
+		if (styleData.getAlignment() != null) {
+			style.setAlignment(styleData.getAlignment().shortValue());
 		}
 
-		if (headerStyleInfo.getOrientation() != null) {
-			headerStyle.setRotation((short) headerStyleInfo.getOrientation().value);
+		if (styleData.getOrientation() != null) {
+			style.setRotation((short) styleData.getOrientation().value);
 		}
-		headerStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-		headerStyle.setFillForegroundColor(headerStyleInfo.getBgColor());
-		font.setBoldweight(headerStyleInfo.getBold());
-		font.setItalic(headerStyleInfo.isItalic());
-		font.setFontName(headerStyleInfo.getFontName());
-		font.setFontHeightInPoints(headerStyleInfo.getFontSize());
-		font.setColor(headerStyleInfo.getFgColor());
-		headerStyle.setFont(font);
+		style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		style.setFillForegroundColor(styleData.getBgColor());
+		font.setBoldweight(styleData.getBold());
+		font.setItalic(styleData.isItalic());
+		font.setFontName(styleData.getFontName());
+		font.setFontHeightInPoints(styleData.getFontSize());
+		font.setColor(styleData.getFgColor());
+		style.setFont(font);
 	}
 
 
-	public void createDataCellStyle(HSSFWorkbook wb) {
-		HSSFFont font = wb.createFont();
-		font = wb.createFont();
-		if (cellStyleInfo.getFormat() != null)
-			cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(cellStyleInfo.getFormat().toString()));
-		if (cellStyleInfo.getAlignment() != null) {
-			cellStyle.setAlignment(cellStyleInfo.getAlignment().shortValue());
-		}
-		if (cellStyleInfo.getOrientation() != null) {
-			cellStyle.setRotation((short) cellStyleInfo.getOrientation().value);
-		}
-		if (cellStyleInfo.getBgColor() != null) {
-			cellStyle.setFillBackgroundColor(cellStyleInfo.getBgColor());
-		}
-		if (cellStyleInfo.getFontColor() != null) {
-			cellStyle.setFillForegroundColor(cellStyleInfo.getFontColor());
-		}
-		if (cellStyleInfo.getFontSize() != null) {
-			font.setFontHeight(cellStyleInfo.getFontSize());
-		}
-		if (cellStyleInfo.getFontStyle() != null) {
-			font.setBoldweight(cellStyleInfo.getFontStyle());
-		}
-		cellStyle.setFont(font);
-
-	}
+//	public void createDataCellStyle(HSSFWorkbook wb) {
+//		HSSFFont font = wb.createFont();
+//		font = wb.createFont();
+//		if (cellStyleInfo.getFormat() != null)
+//			cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(cellStyleInfo.getFormat().toString()));
+//		if (cellStyleInfo.getAlignment() != null) {
+//			cellStyle.setAlignment(cellStyleInfo.getAlignment().shortValue());
+//		}
+//		if (cellStyleInfo.getOrientation() != null) {
+//			cellStyle.setRotation((short) cellStyleInfo.getOrientation().value);
+//		}
+//		if (cellStyleInfo.getBgColor() != null) {
+//			cellStyle.setFillBackgroundColor(cellStyleInfo.getBgColor());
+//		}
+//		if (cellStyleInfo.getFontColor() != null) {
+//			cellStyle.setFillForegroundColor(cellStyleInfo.getFontColor());
+//		}
+//		if (cellStyleInfo.getFontSize() != null) {
+//			font.setFontHeight(cellStyleInfo.getFontSize());
+//		}
+//		if (cellStyleInfo.getFontStyle() != null) {
+//			font.setBoldweight(cellStyleInfo.getFontStyle());
+//		}
+//		cellStyle.setFont(font);
+//
+//	}
 	public void style(HSSFWorkbook wb) {
-		headerStyle = wb.createCellStyle();
-		cellStyle = wb.createCellStyle();
-		createHeaderStyle(wb);
-		createDataCellStyle(wb);
+		style = wb.createCellStyle();
+//		cellStyle = wb.createCellStyle();
+		createStyle(wb);
+//		createDataCellStyle(wb);
 	}
 
-	public HeaderStyleInfo getHeaderStyleInfo() {
-		return headerStyleInfo;
-	}
-	
-	public void setHeaderStyleInfo(HeaderStyleInfo headerStyleInfo) {
-		this.headerStyleInfo = headerStyleInfo;
+	public void setStyle(StyleData styleData) {
+		this.styleData = styleData;
 	}
 
-	public CellStyleInfo getCellStyleInfo() {
-		return cellStyleInfo;
-	}
 
-	public void setCellStyleInfo(CellStyleInfo cellStyleInfo) {
-		this.cellStyleInfo = cellStyleInfo;
-	}
 
 }
