@@ -13,7 +13,7 @@ public class StyleData {
 	private Orientation orientation;
 	private short fgColor;
 	private boolean italic;
-	private short bold;
+	private boolean bold;
 	private String fontName;
 
 	public StyleData() {
@@ -103,11 +103,11 @@ public class StyleData {
 		return this.italic;
 	}
 
-	public void setBold(short bold) {
+	public void setBold(boolean bold) {
 		this.bold = bold;
 	}
 
-	public short getBold() {
+	public boolean isBold() {
 		return this.bold;
 	}
 

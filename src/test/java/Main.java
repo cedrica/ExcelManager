@@ -34,7 +34,7 @@ public class Main extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		List<TestObject> testObjects =  createSomeTestObjects(10);
 		ExcellManager excellManager = new ExcellManager();
-		HSSFWorkbook workbook = excellManager.generateSingleSheetReport(testObjects, TestObject.class);
+		HSSFWorkbook workbook = excellManager.generateSingleReportSheet(testObjects);
 		FileChooser fileChooser = new FileChooser();
 		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XLS files (*.xls)", "*.xls");
         fileChooser.getExtensionFilters().add(extFilter);

@@ -1,3 +1,9 @@
+/**
+ * @author ca.leumaleu
+ * 
+ * This annotation is used on fields of a PoJos that must be take in consideration during the generation of the excel-report.
+ * If a field is not annotated then it will not appears in the report.
+ */
 package excelmanager.annotations;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -13,20 +19,5 @@ public @interface XlsColumn {
 	public String customname() default "";
 	
 	public XlsStyler styler() default @XlsStyler;
-
-
-//	public Orientation orientation() default Orientation.HORIZONTAL;
-//
-//	public short bgColor() default HSSFColor.WHITE.index;
-//
-//	public short fgColor() default HSSFColor.BLACK.index;
-//
-//	public int fontSize() default 10;
-//
-//	public String fontName() default "Arial";
-//
-//	public boolean isBold() default false;
-//
-//	public boolean isItalic() default false;
 
 }

@@ -7,7 +7,7 @@ import excelmanager.annotations.XlsStyler;
 import excelmanager.enums.Location;
 import excelmanager.enums.Orientation;
 
-@XLS(sheetsname="test", xlsAdditionalInformation = @XlsAdditionalInformation(text="je suis une info additionnelle", location=Location.TOP, colspan=4))
+@XLS(sheetsname="test", xlsAdditionalInformation = @XlsAdditionalInformation(text="I am an additional information", location=Location.TOP, colspan=4))
 public class TestObject {
 
 	@XlsColumn(customname="ID")
@@ -18,7 +18,7 @@ public class TestObject {
 	private String	nachname;
 	@XlsColumn(styler = @XlsStyler(bgColor=HSSFColor.RED.index, isBold=true))
 	private int		alt;
-	@XlsColumn(styler = @XlsStyler(bgColor=HSSFColor.YELLOW.index, isBold=true))
+	@XlsColumn(styler = @XlsStyler(bgColor=HSSFColor.YELLOW.index, isBold=true, isItalic = true))
 	private String	addresse;
 	
 	public TestObject(int id , String vorname, String nachname, int alt, String addresse){

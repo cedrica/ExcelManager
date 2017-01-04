@@ -7,7 +7,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 /**
- * Annotate a class with this annotation to declare it as a report
+ * Use this annotation on a class which has to compute into a excel report.
  * 
  * @author ca.leumaleu
  */

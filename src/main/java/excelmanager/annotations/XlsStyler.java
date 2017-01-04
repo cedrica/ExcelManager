@@ -1,3 +1,7 @@
+/**
+ * @author ca.leumaleu
+ * use for cells styling
+ */
 package excelmanager.annotations;
 
 import static java.lang.annotation.ElementType.FIELD;

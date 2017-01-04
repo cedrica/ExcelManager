@@ -1,9 +1,9 @@
 /**
  * @author ca.leumaleu
  * 
- * Sometime there are overviews or footer information that have to be added to the real reports.
- * This annotation allow you to set the information at a desired part of the sheet. 
- * Offer at the same time the possibility to merge the cells in which the text will be setted.
+ * Sometime there are overviews or footer information that have to be added in addition to the reports data.
+ * This annotation allows you to set those additional information at a desired place of the sheet. 
+ * Offers at the same time the possibility to merge the cells in which the text will be setted.
  */
 package excelmanager.annotations;
  
