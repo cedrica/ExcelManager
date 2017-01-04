@@ -1,6 +1,7 @@
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\style\CellStyleInfo.java
 F:\devspace\gitlab\ExcelManager\src\test\java\Main.java
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\enums\Location.java
+F:\devspace\gitlab\ExcelManager\src\test\java\excelmanagertest\TestObject.java
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\enums\Alignment.java
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\annotations\XlsAdditionalInformation.java
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\style\StyleData.java
@@ -13,3 +14,4 @@ F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\style\WoorkbookStyler
 F:\devspace\gitlab\ExcelManager\src\test\java\TestObject.java
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\annotations\XlsColumn.java
 F:\devspace\gitlab\ExcelManager\src\main\java\excelmanager\annotations\XLS.java
+F:\devspace\gitlab\ExcelManager\src\test\java\excelmanagertest\ExcellManagerTest.java
