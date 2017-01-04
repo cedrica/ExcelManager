@@ -35,10 +35,9 @@ public class WoorkbookStyler {
 		}
 		style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 		style.setFillForegroundColor(styleData.getBgColor());
-		if(styleData.isItalic()){
-			
+		if(styleData.isBold()){
+			font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		}
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		font.setItalic(styleData.isItalic());
 		font.setFontName(styleData.getFontName());
 		font.setFontHeightInPoints(styleData.getFontSize());

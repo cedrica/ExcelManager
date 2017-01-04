@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -34,7 +33,6 @@ import excelmanager.style.StyleData;
 import excelmanager.style.WoorkbookStyler;
 
 
-//@SuppressWarnings("all")
 public class ExcellManager {
 	private HashMap<String, HSSFCellStyle> hmFieldStyle = null;
 	private static int FRIST_ROW_INDEX_FOR_DATA = 0;
@@ -56,7 +54,7 @@ public class ExcellManager {
 		int cellnum = 0;
 		HashMap<Location, String> footerInfo = new HashMap<>();
 		Row row;
-		Class<? extends Object> entityClazz = entities.get(0).getClass();
+		Class entityClazz = entities.get(0).getClass();
 		XLS xls = (XLS) entityClazz.getAnnotation(XLS.class);
 		XlsAdditionalInformation additionalInformation = null;
 		if (xls != null) {

@@ -18,7 +18,7 @@ public class Main extends Application{
 	}
 
 	private List<TestObject> createSomeTestObjects(int count) {
-		List<TestObject> testObjects = new ArrayList<>();
+		List<TestObject> testObjects = new ArrayList<TestObject>();
 		for (int id = 0; id < count; id++) {
 			TestObject testObject = new TestObject(id, "vorname"+id, "nachname"+id, id*10, "addresse"+id);
 			testObjects.add(testObject);

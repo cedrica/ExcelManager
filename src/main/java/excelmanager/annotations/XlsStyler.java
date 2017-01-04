@@ -7,7 +7,7 @@ package excelmanager.annotations;
 import static java.lang.annotation.ElementType.FIELD;
 
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 import org.apache.poi.hssf.util.HSSFColor;
@@ -15,7 +15,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import excelmanager.enums.Orientation;
 
 
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RUNTIME)
 @Target({FIELD})
 public @interface XlsStyler {
 	public Orientation orientation() default Orientation.HORIZONTAL;

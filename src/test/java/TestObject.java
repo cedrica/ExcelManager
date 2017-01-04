@@ -18,7 +18,7 @@ public class TestObject {
 	private String	nachname;
 	@XlsColumn(styler = @XlsStyler(bgColor=HSSFColor.RED.index, isBold=true))
 	private int		alt;
-	@XlsColumn(styler = @XlsStyler(bgColor=HSSFColor.YELLOW.index, isBold=true, isItalic = true))
+	@XlsColumn(styler = @XlsStyler(bgColor=HSSFColor.YELLOW.index, isItalic = true))
 	private String	addresse;
 	
 	public TestObject(int id , String vorname, String nachname, int alt, String addresse){
