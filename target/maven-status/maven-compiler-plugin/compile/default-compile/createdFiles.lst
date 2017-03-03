@@ -1,10 +1,13 @@
 excelmanager\ExcellManager.class
+META-INF\MANIFEST.MF
 excelmanager\exception\Assertion.class
 excelmanager\style\StyleData.class
 excelmanager\style\WoorkbookStyler.class
 excelmanager\annotations\XlsAdditionalInformation.class
 excelmanager\enums\Alignment.class
+META-INF\maven\com.preag.excelmanager\ExcelManager\pom.xml
 excelmanager\enums\Orientation.class
+META-INF\maven\com.preag.excelmanager\ExcelManager\pom.properties
 excelmanager\annotations\XLS.class
 excelmanager\annotations\XlsColumn.class
 excelmanager\annotations\XlsStyler.class

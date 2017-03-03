@@ -197,7 +197,7 @@ public class ExcellManager {
 		for (Map.Entry<Integer, Object[]> rowSet : data.entrySet()) {
 			if (rownum == FRIST_ROW_INDEX_FOR_DATA) {
 				for (Object obj : rowSet.getValue()) {
-					row += obj.toString() + ";";
+					row += obj+ ";";
 				}
 				rownum++;
 				row +="\n";
@@ -205,7 +205,7 @@ public class ExcellManager {
 			}
 
 			for (Object obj : rowSet.getValue()) {
-				row += obj.toString() + ";";
+				row += obj+ ";";
 			}
 			row +="\n";
 			rownum++;
