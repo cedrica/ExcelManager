@@ -30,11 +30,10 @@ import excelmanager.enums.Orientation;
 import excelmanager.style.StyleData;
 import excelmanager.style.WoorkbookStyler;
 
-
 public class ExcellManager {
 
-	private HashMap<String, HSSFCellStyle>	hmFieldStyle				= null;
-	private static int						FRIST_ROW_INDEX_FOR_DATA	= 0;
+	private HashMap<String, HSSFCellStyle> hmFieldStyle = null;
+	private static int FRIST_ROW_INDEX_FOR_DATA = 0;
 
 	public ExcellManager() {
 	}
@@ -62,7 +61,7 @@ public class ExcellManager {
 			additionalInformation = xls.xlsAdditionalInformation();
 		} else {
 			System.err.println("ERROR: Die Klasse " + entityClazz.getSimpleName()
-							+ " wurde nicht als Excel-Report deklariert. Bitte die mit @XLS annotieren");
+					+ " wurde nicht als Excel-Report deklariert. Bitte die mit @XLS annotieren");
 			return null;
 		}
 		HSSFSheet sheet = workbook.createSheet(sheetname);
@@ -135,7 +134,6 @@ public class ExcellManager {
 		String sheetname = "";
 		int rownum = 0;
 		HashMap<Location, String> footerInfo = new HashMap<>();
-		Row row;
 		Class entityClazz = entities.get(0).getClass();
 		XLS xls = (XLS) entityClazz.getAnnotation(XLS.class);
 		XlsAdditionalInformation additionalInformation = null;
@@ -144,7 +142,7 @@ public class ExcellManager {
 			additionalInformation = xls.xlsAdditionalInformation();
 		} else {
 			System.err.println("ERROR: Die Klasse " + entityClazz.getSimpleName()
-							+ " wurde nicht als Excel-Report deklariert. Bitte die mit @XLS annotieren");
+					+ " wurde nicht als Excel-Report deklariert. Bitte die mit @XLS annotieren");
 			return null;
 		}
 		if (additionalInformation != null) {
@@ -178,41 +176,41 @@ public class ExcellManager {
 			data.put(key++, builtRowFrom(t, usedFields));
 		}
 
-		String result = insertDataIntoCSV(rownum,  data);
+		String result = insertDataIntoCSV(rownum, data);
 		return result;
 	}
 
-
 	public void mergeCells(HSSFSheet sheet, int colspan, int rowIndex) {
-		sheet.addMergedRegion(new CellRangeAddress(	rowIndex, // mention first row here
-													rowIndex, // mention last row here, it is 1 as we are doing a column
-																// wise merging
-													0, // mention first column of merging
-													colspan // mention last column to include in merge
+		sheet.addMergedRegion(new CellRangeAddress(rowIndex, // mention first
+																// row here
+				rowIndex, // mention last row here, it is 1 as we are doing a
+				0, // mention first column of merging
+				colspan // mention last column to include in merge
 		));
 	}
 
-	public String insertDataIntoCSV(int rownum,  Map<Integer, Object[]> data) {
+	public String insertDataIntoCSV(int rownum, Map<Integer, Object[]> data) {
 		String row = "";
 		for (Map.Entry<Integer, Object[]> rowSet : data.entrySet()) {
 			if (rownum == FRIST_ROW_INDEX_FOR_DATA) {
 				for (Object obj : rowSet.getValue()) {
-					row += obj+ ";";
+					row += obj + ";";
 				}
 				rownum++;
-				row +="\n";
+				row += "\n";
 				continue;
 			}
-
 			for (Object obj : rowSet.getValue()) {
-				row += obj+ ";";
+				if (obj == null)
+					row += "";
+				else
+					row += obj.toString() + ";";
 			}
-			row +="\n";
+			row += "\n";
 			rownum++;
 		}
 		return row;
 	}
-	
 
 	public void insertDataIntoSheet(int rownum, int cellnum, HSSFSheet sheet, Map<Integer, Object[]> data) {
 		Row row;
@@ -277,22 +275,21 @@ public class ExcellManager {
 		sheet.autoSizeColumn((short) cellnum);
 	}
 
-
 	private <T> Object[] builtRowFrom(T entity, List<Field> fieldsName) {
 		Object[] ol = new Object[fieldsName.size()];
 		int i = 0;
 		for (Field field : fieldsName) {
 			try {
-				Object o = entity.getClass().getMethod("get" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1))
-								.invoke(entity);
+				Object o = entity.getClass()
+						.getMethod(
+								"get" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1))
+						.invoke(entity);
 				ol[i++] = o;
-			}
-			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException e) {
 				e.printStackTrace();
 			}
 		}
-
 		return ol;
 	}
 }
