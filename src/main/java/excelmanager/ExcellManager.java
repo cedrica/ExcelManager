@@ -7,6 +7,7 @@ package excelmanager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -29,6 +30,7 @@ import excelmanager.enums.Location;
 import excelmanager.enums.Orientation;
 import excelmanager.style.StyleData;
 import excelmanager.style.WoorkbookStyler;
+import javafx.util.converter.CurrencyStringConverter;
 
 public class ExcellManager {
 
@@ -53,7 +55,7 @@ public class ExcellManager {
 		int cellnum = 0;
 		HashMap<Location, String> footerInfo = new HashMap<>();
 		Row row;
-		Class entityClazz = entities.get(0).getClass();
+		Class<? extends Object> entityClazz = entities.get(0).getClass();
 		XLS xls = (XLS) entityClazz.getAnnotation(XLS.class);
 		XlsAdditionalInformation additionalInformation = null;
 		if (xls != null) {
@@ -131,14 +133,13 @@ public class ExcellManager {
 		if (entities == null || entities.size() == 0)
 			return null;
 		FRIST_ROW_INDEX_FOR_DATA = 0;
-		String sheetname = "";
 		int rownum = 0;
 		HashMap<Location, String> footerInfo = new HashMap<>();
-		Class entityClazz = entities.get(0).getClass();
+		Class<? extends Object> entityClazz = entities.get(0).getClass();
 		XLS xls = (XLS) entityClazz.getAnnotation(XLS.class);
 		XlsAdditionalInformation additionalInformation = null;
 		if (xls != null) {
-			sheetname = (xls.sheetsname().trim().length() <= 0) ? entityClazz.getSimpleName() : xls.sheetsname();
+//			String sheetname = (xls.sheetsname().trim().length() <= 0) ? entityClazz.getSimpleName() : xls.sheetsname();
 			additionalInformation = xls.xlsAdditionalInformation();
 		} else {
 			System.err.println("ERROR: Die Klasse " + entityClazz.getSimpleName()
@@ -163,8 +164,6 @@ public class ExcellManager {
 			XlsColumn xlsAnnotation = f.getAnnotation(XlsColumn.class);
 			if (xlsAnnotation != null) {
 				String customname = xlsAnnotation.customname();
-				XlsStyler xlsStyler = xlsAnnotation.styler();
-				StyleData styleData = extractStyleInfo(xlsStyler);
 				nameOfUsedFields.add((customname.length() <= 0) ? f.getName() : customname);
 				usedFields.add(f);
 			}
@@ -201,9 +200,13 @@ public class ExcellManager {
 				continue;
 			}
 			for (Object obj : rowSet.getValue()) {
-				if (obj == null)
+				if (obj == null){
 					row += ";";
-				else
+				}else if (obj instanceof Double){
+					CurrencyStringConverter c = new CurrencyStringConverter();
+					String item = c.toString(new BigDecimal(obj.toString()));
+					row += item+";";
+				}else
 					row += obj.toString() + ";";
 			}
 			row += "\n";
