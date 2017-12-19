@@ -58,15 +58,15 @@
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
 			<id>preag-internal</id>
-			<name>Corporate Repository</name>
-			<url>http://nexus:8081/repository/preag-internal/</url>
+			<name>Repository for INTERNAL builds</name>
+			<url>http://Vm-rz-nexus.prj-nue-mail.com:8081/repository/preag-internal/</url>
 			<layout>default</layout>
 		</repository>
 		<snapshotRepository>
 			<uniqueVersion>false</uniqueVersion>
 			<id>preag-snapshots</id>
-			<name>Development Snapshots</name>
-			<url>http://nexus:8081/repository/preag-snapshots</url>
+			<name>Repository for SNAPSHOT builds</name>
+			<url>http://Vm-rz-nexus.prj-nue-mail.com:8081/repository/preag-snapshots/</url>
 			<layout>default</layout>
 		</snapshotRepository>
 	</distributionManagement>

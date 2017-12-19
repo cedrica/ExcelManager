@@ -202,7 +202,7 @@ public class ExcellManager {
 			}
 			for (Object obj : rowSet.getValue()) {
 				if (obj == null)
-					row += "";
+					row += ";";
 				else
 					row += obj.toString() + ";";
 			}
